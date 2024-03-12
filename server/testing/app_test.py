@@ -40,7 +40,7 @@ class TestApp:
             restaurant = Restaurant(name=fake.name(), address=fake.address())
             db.session.add(restaurant)
             db.session.commit()
-
+           
             response = app.test_client().get(
                 f'/restaurants/{restaurant.id}')
             assert response.status_code == 200
