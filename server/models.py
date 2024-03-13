@@ -37,6 +37,7 @@ class Restaurant(db.Model, SerializerMixin):
             "id": self.id,
             "name": self.name,
             "address": self.address
+            
         }
 
     def __repr__(self):

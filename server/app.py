@@ -31,7 +31,7 @@ def get_restaurants():
 
 @app.route('/restaurants/<int:id>', methods=['GET'])
 def get_restaurant_by_id(id):
-    restaurant = Restaurant.query.get(id)
+    restaurant = db.session.get(Restaurant, id)
     if restaurant:
         return jsonify(restaurant.to_dict()), 200
     else:
@@ -54,6 +54,25 @@ def get_pizzas():
     pizzas = Pizza.query.all()
     return jsonify([pizza.to_dict() for pizza in pizzas]), 200
 
+@app.route('/restaurant_pizzas', methods=['POST'])
+def create_restaurant_pizza():
+    data = request.get_json()
+    if not data or 'price' not in data or 'pizza_id' not in data or 'restaurant_id' not in data:
+        return jsonify({'errors': ['Missing required fields: price, pizza_id, restaurant_id']}), 500
+
+    pizza = Pizza.query.get(data['pizza_id'])
+    if not pizza:
+        return jsonify({'errors': ['Pizza not found']}), 500
+
+    restaurant = Restaurant.query.get(data['restaurant_id'])
+    if not restaurant:
+        return jsonify({'errors': ['Restaurant not found']}), 500
+
+    restaurant_pizza = RestaurantPizza(price=data['price'], pizza=pizza, restaurant=restaurant)
+    db.session.add(restaurant_pizza)
+    db.session.commit()
+
+    return jsonify(restaurant_pizza.to_dict()), 201
 
 if __name__ == '__main__':
     app.run(port=5557, debug=True)  
